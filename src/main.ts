@@ -10,5 +10,5 @@ async function bootstrap() {
   await app.listen(process.env.PORT);
 }
 bootstrap().then(() =>
-  console.log('👍 Service listening on port: ', process.env.PORT),
+  console.log('👍 Serer is listening on port: ', process.env.PORT),
 );
