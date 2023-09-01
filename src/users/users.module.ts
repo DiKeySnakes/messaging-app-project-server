@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { User, UserSchema } from './schemas/user.schema';
+import { IsUserAlreadyExistConstraint } from './decorators/isUserAlreadyExist';
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { User, UserSchema } from './schemas/user.schema';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, IsUserAlreadyExistConstraint],
 })
 export class UsersModule {}
