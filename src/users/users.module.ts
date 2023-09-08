@@ -3,7 +3,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { User, UserSchema } from './schemas/user.schema';
-import { IsUserAlreadyExistConstraint } from './decorators/isUserAlreadyExist';
+import {
+  IsUserAlreadyExistConstraint,
+  IsEmailAlreadyExistConstraint,
+} from './decorators';
 
 @Module({
   imports: [
@@ -14,6 +17,10 @@ import { IsUserAlreadyExistConstraint } from './decorators/isUserAlreadyExist';
     UsersService,
   ],
   controllers: [UsersController],
-  providers: [UsersService, IsUserAlreadyExistConstraint],
+  providers: [
+    UsersService,
+    IsUserAlreadyExistConstraint,
+    IsEmailAlreadyExistConstraint,
+  ],
 })
 export class UsersModule {}

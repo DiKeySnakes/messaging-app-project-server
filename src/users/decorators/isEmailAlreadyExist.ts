@@ -13,28 +13,28 @@ import { User } from '../schemas/user.schema';
 
 @Injectable()
 @ValidatorConstraint({ async: true })
-export class IsUserAlreadyExistConstraint
+export class IsEmailAlreadyExistConstraint
   implements ValidatorConstraintInterface
 {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async validate(userName: any, args: ValidationArguments) {
-    const user = await this.userModel.findOne({ username: userName });
-    // console.log('username exists: ', user);
+  async validate(userEmail: any, args: ValidationArguments) {
+    const user = await this.userModel.findOne({ email: userEmail });
+    // console.log('email exists: ', user);
     if (user) return false;
     return true;
   }
 }
 
-export function IsUserAlreadyExist(validationOptions?: ValidationOptions) {
+export function IsEmailAlreadyExist(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsUserAlreadyExistConstraint,
+      validator: IsEmailAlreadyExistConstraint,
     });
   };
 }

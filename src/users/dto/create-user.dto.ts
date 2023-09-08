@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
-import { IsUserAlreadyExist } from '../decorators/isUserAlreadyExist';
+import { IsUserAlreadyExist, IsEmailAlreadyExist } from '../decorators';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -8,7 +8,11 @@ export class CreateUserDto {
   })
   username: string;
 
+  @IsNotEmpty()
   @IsEmail()
+  @IsEmailAlreadyExist({
+    message: 'This email $value is already in use. Choose another valid email.',
+  })
   email: string;
 
   @IsNotEmpty()

@@ -20,12 +20,12 @@ export class AuthService {
   ) {}
   async signUp(createUserDto: CreateUserDto): Promise<any> {
     // Check if user exists
-    const userExists = await this.usersService.findByUsername(
-      createUserDto.username,
-    );
-    if (userExists) {
-      throw new BadRequestException('User already exists');
-    }
+    // const userExists = await this.usersService.findByUsername(
+    //   createUserDto.username,
+    // );
+    // if (userExists) {
+    //   throw new BadRequestException('User already exists');
+    // }
 
     // Hash password
     const hash = await this.hashData(createUserDto.password);
