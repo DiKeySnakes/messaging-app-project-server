@@ -7,7 +7,7 @@ import { AppLoggerMiddleware } from './middleware/appLoggerMiddleware';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URI),
     AuthModule,
     UsersModule,

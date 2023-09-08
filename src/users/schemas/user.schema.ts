@@ -21,6 +21,9 @@ export class User {
   active: boolean;
 
   @Prop()
+  refreshToken: string;
+
+  @Prop()
   createdAt: Date;
 
   @Prop()

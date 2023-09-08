@@ -20,4 +20,6 @@ export class CreateUserDto {
     minSymbols: 1,
   })
   password: string;
+
+  refreshToken: string;
 }

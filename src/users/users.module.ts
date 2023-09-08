@@ -11,6 +11,7 @@ import { IsUserAlreadyExistConstraint } from './decorators/isUserAlreadyExist';
   ],
   exports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    UsersService,
   ],
   controllers: [UsersController],
   providers: [UsersService, IsUserAlreadyExistConstraint],

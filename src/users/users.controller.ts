@@ -1,18 +1,51 @@
-import { Controller, Post, Get, Body } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
+import mongoose from 'mongoose';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
-  @Post('create')
+  @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
-  @Get('users')
+  @UseGuards(AccessTokenGuard)
+  @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get(':id')
+  findById(@Param('id') id: string) {
+    return this.usersService.findById(id);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id')
+  update(
+    @Param('id') id: mongoose.Types.ObjectId,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.update(id, updateUserDto);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(id);
   }
 }
