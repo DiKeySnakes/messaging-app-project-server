@@ -20,7 +20,7 @@ export class User {
   @Prop({ default: true })
   active: boolean;
 
-  @Prop()
+  @Prop({ default: null })
   refreshToken: string;
 
   @Prop()

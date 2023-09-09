@@ -1,10 +1,17 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { Request } from 'express';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Request, Response } from 'express';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { RefreshTokenGuard } from 'src/common/guards/refreshToken.guard';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthService } from './auth.service';
-// import { AuthDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -16,10 +23,19 @@ export class AuthController {
   }
 
   @Post('signin')
-  // signin(@Body() authDto: AuthDto) {
-  signin(@Req() req: Request) {
-    console.log('controller: ', req.body);
-    return this.authService.signIn(req.body);
+  async signin(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const { accessToken, refreshToken } = await this.authService.signIn(
+      req.body,
+    );
+
+    res.cookie('jwt', refreshToken, {
+      httpOnly: true, //accessible only by web server
+      secure: true, //https
+      sameSite: 'none', //cross-site cookie
+      maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
+    });
+
+    return { accessToken };
   }
 
   @UseGuards(AccessTokenGuard)
@@ -30,9 +46,24 @@ export class AuthController {
 
   @UseGuards(RefreshTokenGuard)
   @Get('refresh')
-  refreshTokens(@Req() req: Request) {
+  async refreshTokens(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const userId = req.user['sub'];
-    const refreshToken = req.user['refreshToken'];
-    return this.authService.refreshTokens(userId, refreshToken);
+    const oldRefreshToken = req.user['refreshToken'];
+    const { accessToken, refreshToken } = await this.authService.refreshTokens(
+      userId,
+      oldRefreshToken,
+    );
+
+    res.cookie('jwt', refreshToken, {
+      httpOnly: true, //accessible only by web server
+      secure: true, //https
+      sameSite: 'none', //cross-site cookie
+      maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
+    });
+
+    return { accessToken };
   }
 }

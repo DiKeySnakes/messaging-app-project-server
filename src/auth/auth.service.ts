@@ -33,20 +33,20 @@ export class AuthService {
       ...createUserDto,
       password: hash,
     });
-    const tokens = await this.getTokens(newUser._id, newUser.username);
-    await this.updateRefreshToken(newUser._id, tokens.refreshToken);
-    return tokens;
+    // const tokens = await this.getTokens(newUser._id, newUser.username);
+    // await this.updateRefreshToken(newUser._id, tokens.refreshToken);
+    // return tokens;
+    return { message: `New user ${newUser.username} created` };
   }
 
   async signIn(data: AuthDto) {
     // Check if user exists
-    console.log('service: ', data);
     const user = await this.usersService.findByUsername(data.username);
     if (!user) throw new BadRequestException('User does not exist');
     const passwordMatches = await argon2.verify(user.password, data.password);
     if (!passwordMatches)
       throw new BadRequestException('Password is incorrect');
-    const tokens = await this.getTokens(user._id, user.username);
+    const tokens = await this.getTokens(user._id, user.username, user.roles);
     await this.updateRefreshToken(user._id, tokens.refreshToken);
     return tokens;
   }
@@ -69,12 +69,17 @@ export class AuthService {
     });
   }
 
-  async getTokens(userId: mongoose.Types.ObjectId, username: string) {
+  async getTokens(
+    userId: mongoose.Types.ObjectId,
+    username: string,
+    roles: string[],
+  ) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
           sub: userId,
           username,
+          roles,
         },
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
@@ -108,7 +113,7 @@ export class AuthService {
       refreshToken,
     );
     if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
-    const tokens = await this.getTokens(user.id, user.username);
+    const tokens = await this.getTokens(user.id, user.username, user.roles);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;
   }
