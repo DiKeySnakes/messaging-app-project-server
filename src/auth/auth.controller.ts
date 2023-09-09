@@ -39,9 +39,13 @@ export class AuthController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Get('logout')
-  logout(@Req() req: Request) {
+  @Post('logout')
+  logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     this.authService.logout(req.user['sub']);
+    const cookies = req.cookies;
+    if (!cookies?.jwt) return res.sendStatus(204); //No content
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
+    return { message: 'Cookie cleared' };
   }
 
   @UseGuards(RefreshTokenGuard)
