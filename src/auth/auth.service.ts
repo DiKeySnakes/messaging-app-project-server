@@ -18,32 +18,26 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
-  async signUp(createUserDto: CreateUserDto): Promise<any> {
-    // Check if user exists
-    // const userExists = await this.usersService.findByUsername(
-    //   createUserDto.username,
-    // );
-    // if (userExists) {
-    //   throw new BadRequestException('User already exists');
-    // }
 
+  async signUp(createUserDto: CreateUserDto): Promise<any> {
     // Hash password
     const hash = await this.hashData(createUserDto.password);
     const newUser = await this.usersService.create({
       ...createUserDto,
       password: hash,
     });
-    // const tokens = await this.getTokens(newUser._id, newUser.username);
-    // await this.updateRefreshToken(newUser._id, tokens.refreshToken);
-    // return tokens;
     return { message: `New user ${newUser.username} created` };
   }
 
-  async signIn(data: AuthDto) {
+  async signIn(authDto: AuthDto) {
     // Check if user exists
-    const user = await this.usersService.findByUsername(data.username);
+    const user = await this.usersService.findByUsername(authDto.username);
     if (!user) throw new BadRequestException('User does not exist');
-    const passwordMatches = await argon2.verify(user.password, data.password);
+    if (!user.active) throw new ForbiddenException('User must be active');
+    const passwordMatches = await argon2.verify(
+      user.password,
+      authDto.password,
+    );
     if (!passwordMatches)
       throw new BadRequestException('Password is incorrect');
     const tokens = await this.getTokens(user._id, user.username, user.roles);
